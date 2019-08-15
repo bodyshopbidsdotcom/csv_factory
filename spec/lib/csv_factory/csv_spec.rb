@@ -56,4 +56,57 @@ RSpec.describe CsvFactory::Csv do
       '|69|nice'
     ].join("\n"))
   end
+
+  describe '#initialize' do
+    it 'raises an exception if the same section is defined twice' do
+      properties = {
+        sections: [
+          {
+            section_name: 'Header',
+            columns: [ ]
+          },
+          {
+            section_name: 'Header',
+            columns: [ ]
+          }
+        ]
+      }
+
+      expect { CsvFactory::Csv.new(properties) }
+        .to raise_error(CsvFactory::Exception, 'The section `Header` is defined twice')
+    end
+
+    it 'raises an exception if the same column is defined twice' do
+      properties = {
+        sections: [
+          {
+            section_name: 'Header',
+            columns: [
+              { column_name: 'Column A' },
+              { column_name: 'Column A' }
+            ]
+          }
+        ]
+      }
+
+      expect { CsvFactory::Csv.new(properties) }
+        .to raise_error(CsvFactory::Exception, 'The column `Column A` in the section `Header` is defined twice')
+    end
+  end
+
+  describe 'add_rows_to_section' do
+    it 'raises an exception if the section name was not part of the definition' do
+      csv = CsvFactory::Csv.new(
+        sections: [
+          {
+            section_name: 'Header',
+            columns: [ ]
+          }
+        ]
+      )
+
+      expect { csv.add_rows_to_section('DoesNotExist', []) }
+        .to raise_error(CsvFactory::Exception, 'The section `DoesNotExist` is not defined. Maybe it is a symbol/string incosistency with the definition?')
+    end
+  end
 end

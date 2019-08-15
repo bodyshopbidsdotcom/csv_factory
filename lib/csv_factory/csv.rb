@@ -56,9 +56,6 @@ module CsvFactory
     #   'Trailer': [['value', nil, 'value']]
     # }
     def initialize(delimeter: ',', sections: [])
-      # TODO
-      # - [ ] validate sections formatting
-
       @delimeter = delimeter
 
       @sections = sections
@@ -71,16 +68,15 @@ module CsvFactory
 
       sections.each do |section|
         if @data.key?(section[:section_name])
-          # TODO raise exception because the same section is defined twice in the sections
+          raise CsvFactory::Exception.new("The section `#{section[:section_name]}` is defined twice")
         end
 
         @column_positions[section[:section_name]] = {}
         section[:columns].each_with_index do |column, idx|
           if @column_positions[section[:section_name]].key?(column[:column_name])
-            # TODO raise exception because the same column name is defined is defined twice in the sections
-
-            # NOTE! this is a limitation: this library doesn't support 2 columns of the same name, each column
-            # name must be unique :(
+            # NOTE! this is a limitation: this library doesn't support 2 columns of the same name
+            # in the same section. Each column name within a section must be unique :(
+            raise CsvFactory::Exception.new("The column `#{column[:column_name]}` in the section `#{section[:section_name]}` is defined twice")
           end
 
           @column_positions[section[:section_name]][column[:column_name]] = idx
@@ -98,7 +94,10 @@ module CsvFactory
     # Example 2: [{ 'Record Type': 'T', 'Total Batch File LineItem Count': '21' }]
     def add_rows_to_section(section_name, rows)
       unless @data.key?(section_name)
-        # TODO raise exception because that section name doesn't exist in the sections
+        raise CsvFactory::Exception.new(
+          "The section `#{section_name}` is not defined. " \
+          'Maybe it is a symbol/string incosistency with the definition?'
+        )
       end
 
       unless rows.kind_of?(Array)
