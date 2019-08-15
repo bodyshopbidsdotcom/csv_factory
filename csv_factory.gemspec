@@ -4,14 +4,27 @@ $LOAD_PATH.push File.expand_path('lib', __dir__)
 require 'csv_factory/version'
 
 # Describe your gem and declare its dependencies:
-Gem::Specification.new do |s|
-  s.name        = 'csv_factory'
-  s.version     = CsvFactory::VERSION
-  s.authors     = ['Snapsheet, Inc.']
-  s.email       = ['technotifications@snapsheet.me']
-  # s.homepage    = ""
-  s.summary     = 'Tool that builds CSV files'
-  s.license     = 'UNLICENSED'
+Gem::Specification.new do |spec|
+  spec.name        = 'csv_factory'
+  spec.version     = CsvFactory::VERSION
+  spec.authors     = ['Snapsheet, Inc.']
+  spec.email       = ['technotifications@snapsheet.me']
+  # spec.homepage    = ""
+  spec.summary     = 'Tool that builds CSV files'
+  spec.homepage    = 'https://github.com/snapsheet/csv_factory'
+  spec.license     = 'MIT'
 
-  s.files = Dir['lib/**/*', 'README.md']
+  # Files included in this gem.
+  # https://guides.rubygems.org/specification-reference/#files
+  spec.files = Dir['lib/**/*', 'README.md']
+
+  # Paths in the gem to add to $LOAD_PATH when this gem is activated.
+  # https://guides.rubygems.org/specification-reference/#require_paths=
+  spec.require_paths = ['lib']
+
+  # Only with ruby 2.x
+  spec.required_ruby_version = '~> 2.2'
+
+  spec.add_development_dependency 'rspec', '~> 3.8'
+  spec.add_development_dependency 'pry', '~> 0.12'
 end
