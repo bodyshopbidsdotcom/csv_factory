@@ -9,51 +9,43 @@ RSpec.describe CsvFactory::Csv do
           section_name: 'Header',
           columns: [
             { column_name: 'Record Type' },
-            { column_name: 'Environment Type' },
             { column_name: 'FROM Job Application Name' },
             { column_name: 'TO Job Application Name' },
-            { column_name: 'Batch Job Name' },
-            { column_name: 'Batch Job Server Name' },
-            { column_name: 'Batch Job CorrelationId' },
-            { column_name: 'Batch File Name' },
-            { column_name: 'Batch File Creation DateTime' },
-            { column_name: 'Batch File CorrelationId' },
-            { column_name: 'Batch File Sequence Number' }
           ]
         },
         {
           section_name: 'Detail',
           columns: [
             { column_name: 'Record Type' },
-            { column_name: 'Business Unit' },
-            { column_name: 'Claim Number' },
+            { column_name: 'Payment Amount' },
+            { column_name: 'Payee Name' },
           ]
         },
         {
           section_name: 'Trailer',
           columns: [
             { column_name: 'Record Type' },
-            { column_name: 'Total Batch File LineItem Count' },
-            { column_name: 'Total Batch File Amount Total' },
+            { column_name: 'Payments Count' },
+            { column_name: 'Total Amount' },
           ]
         }
       ]
     )
 
-    csv.add_rows_to_section('Header', { 'Record Type' => 'H', 'Environment Type' => 'PRD', 'Batch File Name' => 'batch22.txt' })
-    expect(csv.generate_content).to eq('H|PRD||||||batch22.txt|||')
+    csv.add_rows_to_section('Header', { 'Record Type' => 'H', 'FROM Job Application Name' => 'PaymentsApp', 'TO Job Application Name' => 'Bank' })
+    csv.add_rows_to_section('Detail', [
+      { 'Record Type' => 'D', 'Payment Amount' => 100, 'Payee Name' => 'Santiago' },
+      { 'Record Type' => 'D', 'Payment Amount' => 100, 'Payee Name' => 'John' },
+      { 'Record Type' => 'D', 'Payment Amount' => 100, 'Payee Name' => 'Phil' },
+    ])
+    csv.add_rows_to_section('Trailer', { 'Record Type' => 'T', 'Payments Count' => 3, 'Total Amount' => 300 } )
 
-    csv.add_rows_to_section('Detail', [ { 'Record Type' => 'D', 'Claim Number' => '22' } ])
     expect(csv.generate_content).to eq([
-      'H|PRD||||||batch22.txt|||',
-      'D||22'
-    ].join("\n"))
-
-    csv.add_rows_to_section('Trailer', [ { 'Total Batch File Amount Total' => 'nice', 'Total Batch File LineItem Count' => 69 } ])
-    expect(csv.generate_content).to eq([
-      'H|PRD||||||batch22.txt|||',
-      'D||22',
-      '|69|nice'
+      'H|PaymentsApp|Bank',
+      'D|100|Santiago',
+      'D|100|John',
+      'D|100|Phil',
+      'T|3|300'
     ].join("\n"))
   end
 
